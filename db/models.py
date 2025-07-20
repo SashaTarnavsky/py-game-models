@@ -1,37 +1,42 @@
 from django.db import models
 
-class Race(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    description = models.TextField(blank=True)
 
-    def __str__(self):
+class Race(models.Model):
+    name: str = models.CharField(max_length=255, unique=True)
+    description: str = models.TextField(blank=True)
+
+    def __str__(self) -> str:
         return self.name
 
 
 class Skill(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    bonus = models.CharField(max_length=255)
-    race = models.ForeignKey(Race, on_delete=models.CASCADE, related_name='skills')
+    name: str = models.CharField(max_length=255, unique=True)
+    bonus: str = models.CharField(max_length=255)
+    race: models.ForeignKey = models.ForeignKey(
+        Race, on_delete=models.CASCADE, related_name="skills"
+    )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Guild(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    description = models.TextField(null=True)
+    name: str = models.CharField(max_length=255, unique=True)
+    description: str | None = models.TextField(null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Player(models.Model):
-    nickname = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(max_length=255)
-    bio = models.CharField(max_length=255)
-    race = models.ForeignKey(Race, on_delete=models.CASCADE)
-    guild = models.ForeignKey(Guild, null=True, blank=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now_add=True)
+    nickname: str = models.CharField(max_length=255, unique=True)
+    email: str = models.EmailField(max_length=255)
+    bio: str = models.CharField(max_length=255)
+    race: models.ForeignKey = models.ForeignKey(Race, on_delete=models.CASCADE)
+    guild: models.ForeignKey | None = models.ForeignKey(
+        Guild, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.nickname
