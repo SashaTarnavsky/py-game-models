@@ -1,46 +1,41 @@
-import init_django_orm  # noqa: F401
-from db.models import Race, Skill, Player, Guild
 import json
+from db.models import Player, Race, Skill, Guild
 
 
-def main() -> None:
+def main() -> None:  # Додано 2 порожні рядки та типізацію
     with open("players.json", "r", encoding="utf-8") as f:
         players_data = json.load(f)
 
-    # players_data — це словник, де ключі — ніки, значення — дані гравців
-    for nickname, player in players_data.items():
-        race_data = player.get("race", {})
+    for nickname, player_data in players_data.items():
+        race_info = player_data["race"]
         race_obj, _ = Race.objects.get_or_create(
-            name=race_data.get("name"),
-            defaults={"description": race_data.get("description", "")},
+            name=race_info["name"],
+            defaults={"description": race_info.get("description", "")}
         )
 
-        skills = race_data.get("skills", [])
-        for skill in skills:
+        for skill_info in race_info.get("skills", []):
             Skill.objects.get_or_create(
-                name=skill.get("name"),
-                defaults={"bonus": skill.get("bonus", ""), "race": race_obj},
+                name=skill_info["name"],
+                defaults={
+                    "bonus": skill_info["bonus"],
+                    "race": race_obj
+                }
             )
 
-        guild_data = player.get("guild")
-        if guild_data:
+        guild_obj = None
+        guild_info = player_data.get("guild")
+        if guild_info:
             guild_obj, _ = Guild.objects.get_or_create(
-                name=guild_data.get("name"),
-                defaults={"description": guild_data.get("description")},
+                name=guild_info["name"],
+                defaults={"description": guild_info.get("description")}
             )
-        else:
-            guild_obj = None
 
         Player.objects.get_or_create(
             nickname=nickname,
             defaults={
-                "email": player.get("email", ""),
-                "bio": player.get("bio", ""),
+                "email": player_data["email"],
+                "bio": player_data["bio"],
                 "race": race_obj,
-                "guild": guild_obj,
-            },
+                "guild": guild_obj
+            }
         )
-
-
-if __name__ == "__main__":
-    main()
